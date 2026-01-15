@@ -10,21 +10,7 @@ Utmost brings the timeless insights of Oswald Chambers' *My Utmost for His Highe
 
 ## Demo
 
-```sh
- ⨠ utmost
-
-    My Utmost for His Highest
-
-    │ "Come unto me." — Matthew 11:28
-
-    Are you weary and heavy-laden? Is there a burden weighing on your spirit
-    that you cannot shake? Jesus does not say, "Come unto Me and I will give
-    you rest for your soul." He says, "Come unto Me," period. The rest comes
-    from Him, not from anything you do or feel. The invitation is not to a
-    method, but to a Person.
-
-    Bible Reading: Matthew 11:25-30
-```
+![utmost](https://github.com/user-attachments/assets/07f842bd-84ff-41c1-8a0c-fc139217bad8)
 
 ## Installation
 
