@@ -4,12 +4,14 @@ package internal
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"regexp"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/spf13/cobra"
+	"golang.org/x/term"
 )
 
 var (
@@ -41,7 +43,26 @@ var (
 	bibleRefRegex = regexp.MustCompile(`^[A-Z][a-z]+\s+\d+[-:\d]*;\s+[A-Z][a-z]+\s+\d+`)
 )
 
+func getTerminalWidth() int {
+	width, _, err := term.GetSize(int(os.Stdout.Fd()))
+	if err != nil || width <= 0 {
+		return 80 // default width
+	}
+	if width > 100 {
+		return 100 // cap at 100 for readability
+	}
+	return width
+}
+
 func FetchDevotional(cmd *cobra.Command, args []string) error {
+	width := getTerminalWidth()
+
+	// Apply width to styles
+	styledBody := bodyStyle.Width(width)
+	styledVerse := verseStyle.Width(width - 3) // account for border (1) and padding (2)
+	styledReading := readingStyle.Width(width)
+	styledTitle := titleStyle.Width(width)
+
 	// Fetch the devotional from the website
 	url := "https://utmost.org/updated/today"
 	resp, err := http.Get(url)
@@ -61,7 +82,7 @@ func FetchDevotional(cmd *cobra.Command, args []string) error {
 	// Extract and display the title
 	title := strings.TrimSpace(doc.Find(".elementor-heading-title").First().Text())
 	if title != "" {
-		fmt.Fprintln(out, titleStyle.Render(title))
+		fmt.Fprintln(out, styledTitle.Render(title))
 	}
 
 	// Extract the scripture verse reference
@@ -76,7 +97,7 @@ func FetchDevotional(cmd *cobra.Command, args []string) error {
 		})
 	}
 	if verse != "" {
-		fmt.Fprintln(out, verseStyle.Render(verse))
+		fmt.Fprintln(out, styledVerse.Render(verse))
 	}
 
 	// Extract the main devotional content
@@ -84,9 +105,9 @@ func FetchDevotional(cmd *cobra.Command, args []string) error {
 		text := strings.TrimSpace(p.Text())
 		if text != "" {
 			if bibleRefRegex.MatchString(text) {
-				fmt.Fprintln(out, readingStyle.Render(text))
+				fmt.Fprintln(out, styledReading.Render(text))
 			} else {
-				fmt.Fprintln(out, bodyStyle.Render(text))
+				fmt.Fprintln(out, styledBody.Render(text))
 			}
 		}
 	})
