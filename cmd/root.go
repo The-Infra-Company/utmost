@@ -8,10 +8,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var Version = "0.1.0"
+
 var rootCmd = &cobra.Command{
 	Use:          "utmost",
 	Short:        "My Utmost for His Highest in the CLI",
 	Long:         "A utility for bringing Oswald Chambers' My Utmost for His Highest to the CLI",
+	Version:      Version,
+	PreRunE:      i.CheckConnectivity,
 	RunE:         i.FetchDevotional,
 	SilenceUsage: true,
 }
