@@ -7,12 +7,15 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
 )
+
+const url = "https://utmost.org/updated/today"
 
 var (
 	// Styles for the devotional output
@@ -54,6 +57,26 @@ func getTerminalWidth() int {
 	return width
 }
 
+// CheckConnectivity validates the network connection to utmost.org
+func CheckConnectivity(cmd *cobra.Command, args []string) error {
+	client := &http.Client{
+		Timeout: 5 * time.Second,
+	}
+
+	resp, err := client.Get(url)
+	if err != nil {
+		return fmt.Errorf("failed to connect to %s: %w", url, err)
+	}
+
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to connect to %s: status code %d", url, resp.StatusCode)
+	}
+
+	return nil
+}
+
 func FetchDevotional(cmd *cobra.Command, args []string) error {
 	width := getTerminalWidth()
 
@@ -64,7 +87,6 @@ func FetchDevotional(cmd *cobra.Command, args []string) error {
 	styledTitle := titleStyle.Width(width)
 
 	// Fetch the devotional from the website
-	url := "https://utmost.org/updated/today"
 	resp, err := http.Get(url)
 	if err != nil {
 		return err
